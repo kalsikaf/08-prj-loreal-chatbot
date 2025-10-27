@@ -1,66 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat Assistant</title>
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>L’Oréal | Beauty Chat Advisor</title>
 
-  <body>
-    <div class="page-wrapper">
-      <!------- Header / Branding ------->
-      <header class="site-header">
-        <h1 class="site-title">Smart Product Advisor</h1>
-      </header>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet"/>
 
-      <!------- Chat Area ------->
-      <main>
-        <section class="chatbox">
-          <div id="chatWindow" class="chat-window">
-            <!-- messages will be appended here via JS -->
-          </div>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="site-header" role="banner">
+      <img src="img/loreal-logo.png" alt="L’Oréal Paris logo" class="brand-logo"/>
+      <h1 class="site-title">Beauty Chat Advisor</h1>
+      <p class="site-subtitle">Discover L’Oréal makeup, skincare, haircare, and fragrances—with personalized routines.</p>
+    </header>
 
-          <form id="chatForm" class="chat-form">
-            <label for="userInput" class="visually-hidden">Message</label>
-            <input
-              id="userInput"
-              name="userInput"
-              type="text"
-              placeholder="Ask me about products or routines…"
-              autocomplete="off"
-              required
-            />
-            <button type="submit" id="sendBtn">
-              <span class="material-icons">send</span>
-              <span class="visually-hidden">Send</span>
-            </button>
-          </form>
-        </section>
-      </main>
+    <main role="main">
+      <section class="chatbox" aria-live="polite">
+        <div class="latest-question" id="latestQuestion" aria-hidden="true">
+          <span class="label">Latest question</span>
+          <div class="content" id="latestQuestionText"></div>
+        </div>
 
-      <!------- Footer Links ------->
-      <footer class="site-footer">
-        <p>&copy; 2025 Company Name. All rights reserved.</p>
-        <nav>
-          <!-- These URLs are placeholders -->
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Use</a>
-          <a href="#">Contact</a>
-        </nav>
-      </footer>
-    </div>
+        <div id="chatWindow" class="chat-window" aria-label="Conversation"></div>
 
-    <!-- secrets.js can be removed when using Cloudflare Workers for API requests -->
-    <script src="secrets.js"></script>
-    <script src="script.js"></script>
-  </body>
+        <form id="chatForm" class="chat-form" autocomplete="off">
+          <label for="userInput" class="visually-hidden">Message</label>
+          <input id="userInput" name="userInput" type="text" placeholder="Ask about L’Oréal products or routines…" required/>
+          <button type="submit" id="sendBtn" aria-label="Send message">
+            <span class="material-icons" aria-hidden="true">send</span>
+          </button>
+        </form>
+
+        <p class="disclaimer">Tips are educational, not medical advice. Patch test new products.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <p>&copy; 2025 L’Oréal (student project). All product names & trademarks belong to their owners.</p>
+      <nav aria-label="Footer">
+        <a href="#" aria-disabled="true">Privacy</a>
+        <a href="#" aria-disabled="true">Terms</a>
+        <a href="#" aria-disabled="true">Contact</a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- LOCAL DEV ONLY. Delete after moving to Worker. -->
+  <script src="secrets.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>

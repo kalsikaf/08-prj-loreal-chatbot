@@ -1,40 +1,54 @@
-// Copy this code into your Cloudflare Worker script
-
 export default {
   async fetch(request, env) {
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Content-Type': 'application/json'
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json"
     };
 
-    // Handle CORS preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
+    // Preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: cors });
     }
 
-    const apiKey = env.OPENAI_API_KEY; // Make sure to name your secret OPENAI_API_KEY in the Cloudflare Workers dashboard
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
-    const userInput = await request.json();
+    // Health-check / preview in browser
+    if (request.method === "GET") {
+      return new Response(JSON.stringify({ ok: true, service: "loreal-chat-worker" }), { headers: cors });
+    }
 
-    const requestBody = {
-      model: 'gpt-4o',
-      messages: userInput.messages,
-      max_completion_tokens: 300,
-    };
+    try {
+      // Only POST should carry messages
+      const body = await request.json();
+      const userMessages = Array.isArray(body?.messages) ? body.messages : [];
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      // Enforce brand-safe scope server-side
+      const systemPrompt = {
+        role: "system",
+        content:
+          "You are “L’Oréal Beauty Chat Advisor.” Answer only L’Oréal product/routine questions; " +
+          "politely refuse off-topic and steer back. Be concise, inclusive; avoid medical claims."
+      };
 
-    const data = await response.json();
+      const messages = [systemPrompt, ...userMessages.filter(m => m.role !== "system")];
 
-    return new Response(JSON.stringify(data), { headers: corsHeaders });
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages,
+          max_completion_tokens: 350
+        })
+      });
+
+      const data = await resp.json();
+      return new Response(JSON.stringify(data), { headers: cors, status: resp.status });
+    } catch (err) {
+      return new Response(JSON.stringify({ error: String(err?.message || err) }), { headers: cors, status: 500 });
+    }
   }
 };

@@ -1,0 +1,1 @@
+const CF_WORKER_URL = "https://loreal-chat-worker.kalsikaf.workers.dev"; 
